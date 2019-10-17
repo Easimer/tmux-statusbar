@@ -39,9 +39,9 @@ music_rhythmbox() {
 	if [ "$MUSIC_STATUS" = "(<'Playing'>,)" ]; then
 		TRACK_TITLE=`rhythmbox-client --print-playing | awk -v len=35 '{ if (length($0) > len) print substr($0, 1, len-3) "..."; else print; }'`
 		printf " ♫ %s |"  "$TRACK_TITLE"
-        exit 0
+        return 0
     else
-        exit 1
+        return 1
 	fi
 }
 
@@ -50,15 +50,15 @@ music_mpv() {
     if [[ $? -eq 0 ]] && [[ -e ~/.mpv.socket ]]; then
         TRACK_TITLE=$(echo '{ "command": ["get_property", "metadata"] }' | socat - ~/.mpv.socket | jq '.data."icy-title"')
         printf " ♫ %s |" "$TRACK_TITLE"
-        exit 0
+        return 0
     else
-        exit 1
+        return 1
     fi
 }
 
 music() {
-    if [[ ! music_rhythmbox ]]; then
-        exit 0
+    if music_rhythmbox ; then
+        return 0
     else
         music_mpv
     fi
